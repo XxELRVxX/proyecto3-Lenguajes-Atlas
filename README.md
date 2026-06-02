@@ -55,4 +55,10 @@ La estación orbital simulada se compone lógicamente de 5 locaciones interconec
 
 ## 6. Configuración e Inicio del Servidor Backend (Node.js + Prolog)
 1. Abra una ventana de su terminal de comandos en la carpeta raíz del proyecto y navegue al directorio del servidor de aplicaciones: `cd Backend`
-2. Realice la instalación limpia de las dependencias de red:
+2. Realice la instalación limpia de las dependencias de red: `npm install`
+3. Ejecute el servidor de Node.js para habilitar los endpoints de escucha: `node server.js`. (El backend se levantará automáticamente en el puerto local `3001`, quedando listo para instanciar subprocesos de Prolog).
+
+## 5. Manual de Configuración, Instalación y Ejecución
+1. Abra una segunda pestaña o ventana de su terminal de comandos en la carpeta raíz del proyecto y navegue al directorio de la interfaz web: `cd Frontend` (o donde tenga la carpeta del frontend, pero esto tiene que ser dentro de esa carpeta).
+2. Instale los paquetes y módulos de desarrollo de la biblioteca de React: `npm install`
+3. Inicie el servidor local de desarrollo del entorno web: `npm start`. (El script compilará el código y abrirá de manera automática el navegador web por defecto apuntando a la dirección prediclecta, desplegando formalmente la consola de mandos interactiva de la Operación Atlas).
