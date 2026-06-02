@@ -15,7 +15,7 @@
 :- dynamic reparados/1.
 :- dynamic rescatados/1.
 
-% Estado inicial por defecto (si no hay estado.pl)
+% Valores por defecto
 jugador(puente_mando).
 artefactosLogrados([]).
 usado([]).
@@ -24,18 +24,17 @@ reparados([]).
 rescatados([]).
 
 % -----------------------------------------------------------
-%  Carga estado.pl al arrancar si existe.
-%  estado.pl usa retractall + assert para sobreescribir
-%  los valores por defecto de arriba.
+%  ruta_estado(-Path)
+%  Calcula la ruta a estado.pl sin doble barra.
 % -----------------------------------------------------------
-:- working_directory(Dir, Dir),
-   atomic_list_concat([Dir, '/prolog/estado.pl'], P),
-   ( exists_file(P) -> consult(P) ; true ).
+ruta_estado(P) :-
+    working_directory(Dir, Dir),
+    ( sub_atom(Dir, _, 1, 0, '/') -> DirLimpio = Dir ; atom_concat(Dir, '/', DirLimpio) ),
+    atom_concat(DirLimpio, 'prolog/estado.pl', P).
 
 % -----------------------------------------------------------
 %  guardar_estado/0
-%  Guarda TODO el estado en estado.pl usando retractall+assert
-%  para garantizar que al cargar no haya duplicados.
+%  Guarda el estado completo en estado.pl como hechos est_*.
 % -----------------------------------------------------------
 guardar_estado :-
     jugador(J),
@@ -44,32 +43,23 @@ guardar_estado :-
     lugares(Lug),
     reparados(Rep),
     rescatados(Resc),
-    findall(s(M,S,A,E), hechos:sistema(M,S,A,E),    Sistemas),
-    findall(t(N,M,Ss,E), hechos:tripulante(N,M,Ss,E), Trips),
-    working_directory(Dir, Dir),
-    atomic_list_concat([Dir, '/prolog/estado.pl'], P),
+    findall(est_sistema(M,S,A,E),  hechos:sistema(M,S,A,E),    Sistemas),
+    findall(est_tripulante(N,M,Ss,E), hechos:tripulante(N,M,Ss,E), Trips),
+    ruta_estado(P),
     open(P, write, Stream),
     writeln(Stream, '% estado.pl — generado automaticamente'),
-    % Estado del jugador — retractall + assert para no duplicar
-    format(Stream, ':- retractall(auxiliares:jugador(_)), assertz(auxiliares:jugador(~w)).~n', [J]),
-    format(Stream, ':- retractall(auxiliares:artefactosLogrados(_)), assertz(auxiliares:artefactosLogrados(~w)).~n', [Inv]),
-    format(Stream, ':- retractall(auxiliares:usado(_)), assertz(auxiliares:usado(~w)).~n', [Us]),
-    format(Stream, ':- retractall(auxiliares:lugares(_)), assertz(auxiliares:lugares(~w)).~n', [Lug]),
-    format(Stream, ':- retractall(auxiliares:reparados(_)), assertz(auxiliares:reparados(~w)).~n', [Rep]),
-    format(Stream, ':- retractall(auxiliares:rescatados(_)), assertz(auxiliares:rescatados(~w)).~n', [Resc]),
-    % Sistemas — retractall + assert cada uno
-    writeln(Stream, ':- retractall(hechos:sistema(_,_,_,_)).'),
-    maplist(escribir_sistema(Stream), Sistemas),
-    % Tripulantes — retractall + assert cada uno
-    writeln(Stream, ':- retractall(hechos:tripulante(_,_,_,_)).'),
-    maplist(escribir_tripulante(Stream), Trips),
+    format(Stream, 'est_jugador(~w).~n',       [J]),
+    format(Stream, 'est_inventario(~w).~n',    [Inv]),
+    format(Stream, 'est_usado(~w).~n',         [Us]),
+    format(Stream, 'est_lugares(~w).~n',       [Lug]),
+    format(Stream, 'est_reparados(~w).~n',     [Rep]),
+    format(Stream, 'est_rescatados(~w).~n',    [Resc]),
+    maplist(escribir_termino(Stream), Sistemas),
+    maplist(escribir_termino(Stream), Trips),
     close(Stream).
 
-escribir_sistema(Stream, s(M,S,A,E)) :-
-    format(Stream, ':- assertz(hechos:sistema(~w,~w,~w,~w)).~n', [M,S,A,E]).
-
-escribir_tripulante(Stream, t(N,M,Ss,E)) :-
-    format(Stream, ':- assertz(hechos:tripulante(~w,~w,~w,~w)).~n', [N,M,Ss,E]).
+escribir_termino(Stream, Term) :-
+    format(Stream, '~w.~n', [Term]).
 
 % -----------------------------------------------------------
 %  Utilidades

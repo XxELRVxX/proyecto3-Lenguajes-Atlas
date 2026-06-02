@@ -24,16 +24,16 @@ enlace(laboratorio,  modulo_energia).
 enlace(puente_mando, enfermeria).
 enlace(enfermeria,   modulo_escape).
 
-% ARTEFACTOS
+% ARTEFACTOS (estáticos, nunca cambian)
 artefacto(traje_espacial,    enfermeria).
 artefacto(fusible,           laboratorio).
 artefacto(tarjeta_seguridad, puente_mando).
 
-% SISTEMAS (estado inicial — puede ser sobreescrito por estado.pl)
+% SISTEMAS — valores iniciales, juego.pl los sobreescribe si hay estado.pl
 sistema(modulo_energia, energia,        [fusible],                 fallo).
 sistema(laboratorio,    comunicaciones, [fusible, traje_espacial], fallo).
 
-% TRIPULANTES (estado inicial — puede ser sobreescrito por estado.pl)
+% TRIPULANTES — valores iniciales
 tripulante(elena, modulo_energia, [energia], atrapado).
 tripulante(kai,   enfermeria,     [energia], atrapado).
 
