@@ -46,7 +46,7 @@ function ejecutarProlog(goal) {
 }
 
 // Estado del juego guardado en Node (espejo del estado Prolog)
-// Esto permite que React sepa qué mostrar sin consultar Prolog cada vez
+// Esto permite que React sepa lo que tengo que mostrar sin consultar Prolog cada vez
 let estadoJuego = {
     lugar: 'puente_mando',
     inventario: [],
@@ -174,19 +174,17 @@ app.get('/api/reset', (req, res) => {
     const fs = require('fs');
     const estadoPath = path.join(__dirname, 'prolog', 'estado.pl');
     const estadoInicial =
-`% estado.pl — generado automaticamente
-:- retractall(auxiliares:jugador(_)), assertz(auxiliares:jugador(puente_mando)).
-:- retractall(auxiliares:artefactosLogrados(_)), assertz(auxiliares:artefactosLogrados([])).
-:- retractall(auxiliares:usado(_)), assertz(auxiliares:usado([])).
-:- retractall(auxiliares:lugares(_)), assertz(auxiliares:lugares([puente_mando])).
-:- retractall(auxiliares:reparados(_)), assertz(auxiliares:reparados([])).
-:- retractall(auxiliares:rescatados(_)), assertz(auxiliares:rescatados([])).
-:- retractall(hechos:sistema(_,_,_,_)).
-:- assertz(hechos:sistema(modulo_energia,energia,[fusible],fallo)).
-:- assertz(hechos:sistema(laboratorio,comunicaciones,[fusible,traje_espacial],fallo)).
-:- retractall(hechos:tripulante(_,_,_,_)).
-:- assertz(hechos:tripulante(elena,modulo_energia,[energia],atrapado)).
-:- assertz(hechos:tripulante(kai,enfermeria,[energia],atrapado)).
+`% estado.pl — estado inicial limpio
+est_jugador(puente_mando).
+est_inventario([]).
+est_usado([]).
+est_lugares([puente_mando]).
+est_reparados([]).
+est_rescatados([]).
+est_sistema(modulo_energia,energia,[fusible],fallo).
+est_sistema(laboratorio,comunicaciones,[fusible,traje_espacial],fallo).
+est_tripulante(elena,modulo_energia,[energia],atrapado).
+est_tripulante(kai,enfermeria,[energia],atrapado).
 `;
     fs.writeFileSync(estadoPath, estadoInicial);
     res.json({ ok: true, respuesta: 'Juego reiniciado.' });
